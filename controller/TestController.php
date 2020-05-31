@@ -1,12 +1,13 @@
 <?php
 
-
-
-
 class TestController
 {
 public function actionindex(){
 
-    echo 'dsa';
+    include "./view/Test.html";
 }
+    public function actionview(){
+
+        echo 'Its, View';
+    }
 }

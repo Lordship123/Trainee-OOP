@@ -24,32 +24,33 @@ class Router
 
         // Проверяю наличие такой строки в роут
         foreach ($this->routes as $urlPattern => $path) {
-//            echo "<br> $urlPattern => $path";
+            //echo "<br> $urlPattern => $path";
 
             //Сравниваем Строку запроса $urlPattern и $url
-            if (preg_match("~$urlPattern~", $url)) {
+                 if (preg_match("~$urlPattern~", $url)) {
 
-                $segments = explode('/', $path);
+                     $Internalroute = preg_replace("~$urlPattern~", $path, $url); // ищем параметры в строке запроса
 
-                $controllerName = array_shift($segments) . 'Controller'; // Получаем имя контроллера и вставляем к нему приставку
+                     $segments = explode('/', $Internalroute);
 
-                $controllerName = ucfirst($controllerName); // Делаем первую букву заглавной
+                     $controllerName = array_shift($segments) . 'Controller'; // Получаем имя контроллера и вставляем к нему приставку
+                     $controllerName = ucfirst($controllerName); // Делаем первую букву заглавной
 
-                $actionName = 'action' . ucfirst(array_shift($segments));
+                     $actionName = 'action' . ucfirst(array_shift($segments));
+                     $parametrs = $segments; // массив с параметрами
 
                 //подключаем файл класса контроллера
                 $controllerFile = ROOT . '/controller/' . $controllerName . '.php';
                 if (file_exists($controllerFile)) {
                     include_once($controllerFile);
                 }
-                // Создаем экземпляр класса
+                     //Создаем экземпляр класса
+                     $controllerObject = new $controllerName;
 
-                $controllerObject = new $controllerName;
-
-                $result = $controllerObject->$actionName();
+                $result = call_user_func_array(array($controllerObject, $actionName), $parametrs);
 
                 if ($result != null) {
-                    break;
+                    break; // обрываем цепочку поиска
                 }
             }
         }
